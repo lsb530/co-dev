@@ -15,6 +15,10 @@
     * 4xx: 400, 401, 403, 404, 409
     * 5xx: 500, 501, 502(nginx)
 
+### Postman
+<img src="../img/co-dev_API.png" alt="API image">
+
+
 ### 인증(/api/v1/auth)
 
 | **_Method_** | **_Path_**    | **_Code_** | **_Permission_** | **_Action_** |
