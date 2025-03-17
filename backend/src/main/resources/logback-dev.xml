@@ -1,0 +1,44 @@
+<configuration>
+    <property name="LOG_FILE_PATH" value="./backend/logs"/>
+    <property name="ACTIVE_LOG_FILE" value="${LOG_FILE_PATH}/backend.log"/>
+    <property name="ROLLING_LOG_FILE" value="${LOG_FILE_PATH}/backend-%i.%d{yyyy-MM-dd}.log.gz"/>
+
+    <!-- 콘솔 Appender 설정 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- WARN 이상 로그 출력 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>warn</level>
+        </filter>
+        <!-- 패턴 -->
+        <encoder>
+            <pattern>[%X{request_id:-startup}] %d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 파일 Appender 설정 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 경로 -->
+        <file>${ACTIVE_LOG_FILE}</file>
+        <!-- WARN 이상 로그 출력 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+        <!-- 날짜별 & 크기별 Rolling -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${ROLLING_LOG_FILE}</fileNamePattern>
+            <maxFileSize>50MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 패턴 -->
+        <encoder>
+            <pattern>[%X{request_id:-startup}] %d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root Logger Appender 등록, INFO 이상 로그 기록 -->
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+</configuration>
