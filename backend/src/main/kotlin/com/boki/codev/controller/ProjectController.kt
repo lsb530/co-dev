@@ -14,7 +14,7 @@ class ProjectController(
     private val projectService: ProjectService,
 ) {
     @PreAuthorize("isAuthenticated()")
-    @GetMapping(produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping
     fun getProjects(): ResponseEntity<Any> {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(projectService.getProjects())
     }
