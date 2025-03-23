@@ -32,14 +32,14 @@ class Project(
     var owner: User?,
 
     @OneToMany(mappedBy = "project")
-    val workers: MutableList<Worker> = mutableListOf(),
+    val workers: List<Worker> = mutableListOf(),
 
     @OneToMany(mappedBy = "project")
-    val tasks: MutableList<Task> = mutableListOf(),
+    val tasks: List<Task> = mutableListOf(),
 
     @ElementCollection
     @CollectionTable(name = "project_tags")
-    val tags: MutableSet<String> = mutableSetOf(),
+    val tags: Set<String> = mutableSetOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

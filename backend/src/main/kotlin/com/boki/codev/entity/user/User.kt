@@ -29,16 +29,16 @@ class User(
     val role: Role,
 
     @OneToMany(mappedBy = "owner")
-    val projects: MutableList<Project> = mutableListOf(),
+    val projects: List<Project> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val comments: MutableList<Comment> = mutableListOf(),
+    val comments: List<Comment> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val workers: MutableList<Worker> = mutableListOf(),
+    val workers: List<Worker> = mutableListOf(),
 
     @OneToMany(mappedBy = "user")
-    val assignedTasks: MutableList<AssignTask> = mutableListOf(),
+    val assignedTasks: List<AssignTask> = mutableListOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

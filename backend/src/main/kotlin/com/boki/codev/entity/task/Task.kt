@@ -20,13 +20,13 @@ class Task(
 
     @ElementCollection
     @CollectionTable(name = "task_tags")
-    val tags: MutableSet<String> = mutableSetOf(),
+    val tags: Set<String> = mutableSetOf(),
 
     @OneToMany(mappedBy = "task")
-    val comments: MutableList<Comment> = mutableListOf(),
+    val comments: List<Comment> = mutableListOf(),
 
     @OneToMany(mappedBy = "task")
-    val assignedTasks: MutableList<AssignTask> = mutableListOf(),
+    val assignedTasks: List<AssignTask> = mutableListOf(),
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", foreignKey = ForeignKey(name = "fk_task_project_id"), nullable = false)

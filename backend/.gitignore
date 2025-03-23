@@ -38,3 +38,6 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+application.yaml
+application-test.yaml
