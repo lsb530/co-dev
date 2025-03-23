@@ -49,7 +49,6 @@ class ProjectServiceTest : BehaviorSpec({
 
             Then("프로젝트 목록 조회를 할 수 있다") {
                 val result = projectService.getProjects()
-                println(result)
 
                 result.size shouldBe 3
                 result[0].owner shouldBe email

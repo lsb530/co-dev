@@ -17,7 +17,6 @@ class AuthController(
 ) {
     @PostMapping
     fun login(@RequestBody request: AuthenticationRequest): AuthenticationResponse {
-        println(request)
         return authenticationService.authentication(request)
     }
 
