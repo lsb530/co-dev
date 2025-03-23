@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/co-dev-test
+    username:
+    password:
+  sql:
+    init:
+      data-locations:
+      mode:
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    defer-datasource-initialization: true
+  data:
+    redis:
+      host:
+      port:
+      database:
+      timeout:
+      lettuce:
+        pool:
+          max-active:
+          max-idle:
+          min-idle:
+          max-wait:
+
+jwt:
+  secret-key:
+  access-token-expiration:
+  refresh-token-expiration:
