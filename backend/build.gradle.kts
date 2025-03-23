@@ -43,6 +43,14 @@ dependencies {
     implementation("org.mindrot:jbcrypt:0.4")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("io.mockk:mockk:1.13.17")
+    testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.kotest.extensions:kotest-extensions-spring:1.3.0")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter-kotlin:1.1.10")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jackson:1.1.10")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-jakarta-validation:1.1.10")
+    testImplementation("com.navercorp.fixturemonkey:fixture-monkey-kotest:1.1.10")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
