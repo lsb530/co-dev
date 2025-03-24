@@ -8,6 +8,8 @@ import com.boki.codev.entity.user.User
 import jakarta.validation.constraints.Future
 import jakarta.validation.constraints.FutureOrPresent
 import jakarta.validation.constraints.NotBlank
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.PositiveOrZero
 import java.time.LocalDateTime
 
 data class ProjectCreateRequest(
@@ -19,7 +21,7 @@ data class ProjectCreateRequest(
 
     @field:NotBlank(message = "프로젝트 상태는 비어있을 수 없습니다.")
     @field:EnumValue(enumClass = ProjectStatus::class, message = "프로젝트 상태가 잘못 입력되었습니다.")
-    private val status: String?,
+    val status: String?,
 
     @field:FutureOrPresent(message = "프로젝트 시작일은 과거일 수 없습니다.")
     val startDt: LocalDateTime? = LocalDateTime.now(),
@@ -27,26 +29,43 @@ data class ProjectCreateRequest(
     @field:Future(message = "프로젝트 종료일은 과거일 수 없습니다.")
     val endDt: LocalDateTime? = null,
 
-    val owner: User?,
+    @field:NotNull(message = "프로젝트 초기 담당자는 비어있을 수 없습니다.")
+    val ownerId: Long,
 
-    private val tags: List<Long>? = null ?: emptyList(),
+    val tags: List<Long>? = null ?: emptyList(),
 ) {
     val projectStatus: ProjectStatus?
         get() = status?.let { ProjectStatus.valueOf(it) }
 
-    companion object {
-        fun toEntity(req: ProjectCreateRequest): Project {
-            return Project(
-                name = requireNotNull(req.name),
-                description = requireNotNull(req.description),
-                projectStatusWrapper = ProjectStatusWrapper(requireNotNull(req.projectStatus)),
-                startDt = req.startDt,
-                endDt = req.endDt,
-                owner = req.owner,
-            )
-        }
+    fun toEntity(owner: User, tags: MutableSet<String>): Project {
+        return Project(
+            name = requireNotNull(name),
+            description = requireNotNull(description),
+            projectStatusWrapper = ProjectStatusWrapper(requireNotNull(projectStatus)),
+            startDt = startDt,
+            endDt = endDt,
+            owner = owner,
+            tags = tags
+        )
     }
 }
+
+data class ProjectUpdateRequest(
+    val description: String?,
+
+    @field:EnumValue(enumClass = ProjectStatus::class, message = "프로젝트 상태(status)가 잘못 입력되었습니다.")
+    val status: String?,
+
+    @field:Future(message = "프로젝트 종료일은 과거일 수 없습니다.")
+    val endDt: LocalDateTime? = null,
+
+    val tags: List<Long>? = null ?: emptyList(),
+)
+
+data class Owner(
+    @field:PositiveOrZero(message = "ownerId는 null 또는 양수여야 합니다.")
+    val ownerId: Long?
+)
 
 data class ProjectSimpleResponse(
     val id: Long,
