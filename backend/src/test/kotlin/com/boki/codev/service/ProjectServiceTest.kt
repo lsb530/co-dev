@@ -33,8 +33,8 @@ class ProjectServiceTest : BehaviorSpec({
         TestSecurityContextHolder.clearContext()
     }
 
-    Given("프로젝트 목록을 조회할 때") {
-        When("인증정보가 있는(로그인을 한) 사용자가 ADMIN 권한인 경우") {
+    Given("프로젝트 목록 조회 요청 시") {
+        When("관리자(ADMIN) 권한으로 로그인한 경우") {
             val email = "admin@co-dev.com"
 
             val auth = TestingAuthenticationToken(email, "admin", "ROLE_ADMIN")
@@ -60,7 +60,7 @@ class ProjectServiceTest : BehaviorSpec({
             every { projectRepository.findMyProjects(adminUser) } returns adminProjects
             every { projectRepository.findAll() } returns allProjects
 
-            Then("모든 프로젝트 조회를 할 수 있다") {
+            Then("모든 프로젝트 목록이 조회된다") {
                 val result = projectService.getProjects()
 
                 result.size shouldBe 3
@@ -72,7 +72,7 @@ class ProjectServiceTest : BehaviorSpec({
             }
         }
 
-        When("인증정보가 있는(로그인을 한) 사용자가 MANAGER 권한인 경우") {
+        When("매니저(MANAGER) 권한으로 로그인한 경우") {
             val email = "manager1@co-dev.com"
 
             val auth = TestingAuthenticationToken(email, "manager", "ROLE_MANAGER")
@@ -98,7 +98,7 @@ class ProjectServiceTest : BehaviorSpec({
             every { projectRepository.findMyProjects(managerUser1) } returns managerProjects
             every { projectRepository.findAll() } returns allProjects
 
-            Then("자신의 소유인 프로젝트 조회를 할 수 있다") {
+            Then("본인이 소유한 프로젝트만 조회된다") {
                 val result = projectService.getProjects()
 
                 result.size shouldBe 2
@@ -110,7 +110,7 @@ class ProjectServiceTest : BehaviorSpec({
             }
         }
 
-        When("인증정보가 없는(로그인을 하지 않은) 요청일 경우") {
+        When("로그인하지 않은 경우") {
             val anonymousAuth = AnonymousAuthenticationToken(
                 "anonymous",
                 "anonymousUser",
@@ -118,7 +118,7 @@ class ProjectServiceTest : BehaviorSpec({
             )
             TestSecurityContextHolder.getContext().authentication = anonymousAuth
 
-            Then("프로젝트 목록 조회를 할 수 없다") {
+            Then("권한 없음 예외가 발생한다") {
                 every { userRepository.findUserByEmail(any()) } returns null
 
                 shouldThrow<NoSuchElementException> {
