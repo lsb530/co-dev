@@ -34,29 +34,37 @@ class ProjectServiceTest : BehaviorSpec({
     }
 
     Given("프로젝트 목록 조회 요청 시") {
+        val adminEmail = "admin@co-dev.com"
+        val managerEmail = "manager1@co-dev.com"
+
+        val adminAuth = TestingAuthenticationToken(adminEmail, "admin", "ROLE_ADMIN")
+        val managerAuth = TestingAuthenticationToken(managerEmail, "manager", "ROLE_MANAGER")
+        val anonymousAuth = AnonymousAuthenticationToken(
+            "anonymous",
+            "anonymousUser",
+            listOf(SimpleGrantedAuthority("ROLE_ANONYMOUS"))
+        )
+
+        val adminProjects = sut.giveMeKotlinBuilder<Project>()
+            .setNotNull("id")
+            .set("owner", adminUser)
+            .set("workers", mutableListOf<Worker>())
+            .set("tasks", mutableListOf<Task>())
+            .sampleList(1)
+
+        val managerProjects = sut.giveMeKotlinBuilder<Project>()
+            .setNotNull("id")
+            .set("owner", managerUser1)
+            .set("workers", mutableListOf<Worker>())
+            .set("tasks", mutableListOf<Task>())
+            .sampleList(2)
+
+        val allProjects = adminProjects + managerProjects
+
         When("관리자(ADMIN) 권한으로 로그인한 경우") {
-            val email = "admin@co-dev.com"
+            TestSecurityContextHolder.getContext().authentication = adminAuth
 
-            val auth = TestingAuthenticationToken(email, "admin", "ROLE_ADMIN")
-            TestSecurityContextHolder.getContext().authentication = auth
-
-            val adminProjects = sut.giveMeKotlinBuilder<Project>()
-                .setNotNull("id")
-                .set("owner", adminUser)
-                .set("workers", mutableListOf<Worker>())
-                .set("tasks", mutableListOf<Task>())
-                .sampleList(1)
-
-            val managerProjects = sut.giveMeKotlinBuilder<Project>()
-                .setNotNull("id")
-                .set("owner", managerUser1)
-                .set("workers", mutableListOf<Worker>())
-                .set("tasks", mutableListOf<Task>())
-                .sampleList(2)
-
-            val allProjects = adminProjects + managerProjects
-
-            every { userRepository.findUserByEmail(email) } returns adminUser
+            every { userRepository.findUserByEmail(adminEmail) } returns adminUser
             every { projectRepository.findMyProjects(adminUser) } returns adminProjects
             every { projectRepository.findAll() } returns allProjects
 
@@ -64,63 +72,38 @@ class ProjectServiceTest : BehaviorSpec({
                 val result = projectService.getProjects()
 
                 result.size shouldBe 3
-                result[0].owner shouldBe email
+                result[0].owner shouldBe adminEmail
 
                 verify(exactly = 1) { projectRepository.findAll() }
-                verify(exactly = 0) { userRepository.findUserByEmail(email) }
+                verify(exactly = 0) { userRepository.findUserByEmail(adminEmail) }
                 verify(exactly = 0) { projectRepository.findMyProjects(adminUser) }
             }
         }
 
         When("매니저(MANAGER) 권한으로 로그인한 경우") {
-            val email = "manager1@co-dev.com"
+            TestSecurityContextHolder.getContext().authentication = managerAuth
 
-            val auth = TestingAuthenticationToken(email, "manager", "ROLE_MANAGER")
-            TestSecurityContextHolder.getContext().authentication = auth
-
-            val adminProjects = sut.giveMeKotlinBuilder<Project>()
-                .setNotNull("id")
-                .set("owner", adminUser)
-                .set("workers", mutableListOf<Worker>())
-                .set("tasks", mutableListOf<Task>())
-                .sampleList(1)
-
-            val managerProjects = sut.giveMeKotlinBuilder<Project>()
-                .setNotNull("id")
-                .set("owner", managerUser1)
-                .set("workers", mutableListOf<Worker>())
-                .set("tasks", mutableListOf<Task>())
-                .sampleList(2)
-
-            val allProjects = adminProjects + managerProjects
-
-            every { userRepository.findUserByEmail(email) } returns managerUser1
+            every { userRepository.findUserByEmail(managerEmail) } returns managerUser1
             every { projectRepository.findMyProjects(managerUser1) } returns managerProjects
-            every { projectRepository.findAll() } returns allProjects
 
             Then("본인이 소유한 프로젝트만 조회된다") {
                 val result = projectService.getProjects()
 
                 result.size shouldBe 2
-                result[0].owner shouldBe email
+                result[0].owner shouldBe managerEmail
 
                 verify(exactly = 0) { projectRepository.findAll() }
-                verify(exactly = 1) { userRepository.findUserByEmail(email) }
+                verify(exactly = 1) { userRepository.findUserByEmail(managerEmail) }
                 verify(exactly = 1) { projectRepository.findMyProjects(managerUser1) }
             }
         }
 
         When("로그인하지 않은 경우") {
-            val anonymousAuth = AnonymousAuthenticationToken(
-                "anonymous",
-                "anonymousUser",
-                listOf(SimpleGrantedAuthority("ROLE_ANONYMOUS"))
-            )
             TestSecurityContextHolder.getContext().authentication = anonymousAuth
 
-            Then("권한 없음 예외가 발생한다") {
-                every { userRepository.findUserByEmail(any()) } returns null
+            every { userRepository.findUserByEmail(any()) } returns null
 
+            Then("권한 없음 예외가 발생한다") {
                 shouldThrow<NoSuchElementException> {
                     projectService.getProjects()
                 }

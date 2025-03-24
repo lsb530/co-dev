@@ -32,7 +32,7 @@ data class ProjectCreateRequest(
     @field:NotNull(message = "프로젝트 초기 담당자는 비어있을 수 없습니다.")
     val ownerId: Long,
 
-    val tags: List<Long>? = null ?: emptyList(),
+    val tags: List<Long>? = emptyList(),
 ) {
     val projectStatus: ProjectStatus?
         get() = status?.let { ProjectStatus.valueOf(it) }
@@ -59,7 +59,7 @@ data class ProjectUpdateRequest(
     @field:Future(message = "프로젝트 종료일은 과거일 수 없습니다.")
     val endDt: LocalDateTime? = null,
 
-    val tags: List<Long>? = null ?: emptyList(),
+    val tags: List<Long>? = emptyList(),
 )
 
 data class Owner(
