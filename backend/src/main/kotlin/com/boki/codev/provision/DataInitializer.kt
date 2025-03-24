@@ -48,11 +48,12 @@ class DataInitializer(
     fun initUsers(userRepository: UserRepository) {
         if (isEmpty(userRepository)) {
             val admin = User(username = "admin", email = "admin@co-dev.com", password = "admin", role = Role.ADMIN)
-            val manager = User(username = "manager", email = "manager@co-dev.com", password = "manager", role = Role.MANAGER)
+            val manager1 = User(username = "manager1", email = "manager1@co-dev.com", password = "manager", role = Role.MANAGER)
+            val manager2 = User(username = "manager2", email = "manager2@co-dev.com", password = "manager", role = Role.MANAGER)
             val worker = User(username = "worker", email = "worker@co-dev.com", password = "worker", role = Role.WORKER)
 
             userRepository.saveAll(
-                listOf(admin, manager, worker)
+                listOf(admin, manager1, manager2, worker)
             )
         }
     }
@@ -64,7 +65,6 @@ class DataInitializer(
 
     fun getUsers() {
         val users = userRepository.findAll()
-        println(users.size)
         for (user in users) {
             println(user)
         }
