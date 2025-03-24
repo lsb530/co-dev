@@ -5,8 +5,10 @@ import com.boki.codev.entity.task.Task
 import com.boki.codev.entity.user.User
 import com.boki.codev.entity.worker.Worker
 import jakarta.persistence.*
+import org.hibernate.annotations.SQLRestriction
 import java.time.LocalDateTime
 
+@SQLRestriction("deleted_at IS NULL")
 @Table(name = "projects")
 @Entity
 class Project(
@@ -18,7 +20,7 @@ class Project(
     var description: String,
 
     @Embedded
-    val projectStatusWrapper: ProjectStatusWrapper,
+    var projectStatusWrapper: ProjectStatusWrapper,
 
     @Column(nullable = true)
     val startDt: LocalDateTime? = LocalDateTime.now(),
@@ -39,7 +41,7 @@ class Project(
 
     @ElementCollection
     @CollectionTable(name = "project_tags")
-    val tags: Set<String> = mutableSetOf(),
+    var tags: MutableSet<String> = mutableSetOf(),
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -8,7 +8,6 @@ import com.boki.codev.entity.project.Project
 import com.boki.codev.entity.worker.Worker
 import jakarta.persistence.*
 import org.hibernate.annotations.SQLRestriction
-import org.springframework.security.core.userdetails.UserDetails
 
 @SQLRestriction("deleted_at IS NULL")
 @Table(name = "users")
@@ -47,4 +46,7 @@ class User(
     override fun toString(): String {
         return "User(username='$username', email='$email', password='$password', role=$role, id=$id)"
     }
+
+    val isManager: Boolean
+        get() = this.role == Role.MANAGER
 }
