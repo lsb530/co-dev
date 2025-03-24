@@ -14,4 +14,8 @@ data class MyInfo(
             )
         }
     }
+
+    fun toLoggerString(): String {
+        return "username: $username, authorities: ${authorities.joinToString(", ")}"
+    }
 }

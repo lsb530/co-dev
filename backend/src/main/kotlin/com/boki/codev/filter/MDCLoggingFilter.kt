@@ -6,7 +6,6 @@ import jakarta.servlet.ServletRequest
 import jakarta.servlet.ServletResponse
 import jakarta.servlet.http.HttpServletRequest
 import org.slf4j.MDC
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.util.UUID
 
@@ -18,11 +17,6 @@ class MDCLoggingFilter: Filter {
         val requestId = (request as HttpServletRequest).getHeader("X-RequestID")
             ?: UUID.randomUUID().toString().replace("-", "")
         MDC.put("request_id", requestId)
-
-        val authentication = SecurityContextHolder.getContext().authentication
-        authentication?.let {
-            MDC.put("auth_details", authentication.details.toString())
-        }
 
         chain.doFilter(request, response)
 

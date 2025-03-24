@@ -1,9 +1,11 @@
 package com.boki.codev.filter
 
+import com.boki.codev.dto.MyInfo
 import com.boki.codev.security.JwtTokenService
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import org.slf4j.MDC
 import org.springframework.boot.web.servlet.filter.OrderedFilter
 import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
@@ -38,6 +40,7 @@ class JwtAuthenticationFilter(
                     val authToken = UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.authorities
                     )
+                    MDC.put("authentication", MyInfo.fromUserDetails(authToken.principal as UserDetails).toLoggerString())
                     authToken.details = WebAuthenticationDetailsSource().buildDetails(request)
                     SecurityContextHolder.getContext().authentication = authToken
                 }
