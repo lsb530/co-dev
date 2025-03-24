@@ -1,11 +1,17 @@
 package com.boki.codev.service
 
+import com.boki.codev.dto.ProjectCreateRequest
 import com.boki.codev.entity.project.Project
+import com.boki.codev.entity.project.ProjectStatus
+import com.boki.codev.entity.project.ProjectStatusWrapper
+import com.boki.codev.entity.tag.Tag
 import com.boki.codev.entity.task.Task
 import com.boki.codev.entity.worker.Worker
+import com.boki.codev.exception.NotFoundException
 import com.boki.codev.fixture.adminUser
 import com.boki.codev.fixture.managerUser1
 import com.boki.codev.fixture.sut
+import com.boki.codev.fixture.workerUser
 import com.boki.codev.repository.ProjectRepository
 import com.boki.codev.repository.TagRepository
 import com.boki.codev.repository.UserRepository
@@ -17,16 +23,20 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.authentication.TestingAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.test.context.TestSecurityContextHolder
+import java.util.Optional
 
 class ProjectServiceTest : BehaviorSpec({
     val userRepository = mockk<UserRepository>()
     val projectRepository = mockk<ProjectRepository>()
     val tagRepository = mockk<TagRepository>()
     val projectService = ProjectService(userRepository, projectRepository, tagRepository)
+
+    val tag = mockk<Tag>(relaxed = true)
 
     afterTest {
         clearAllMocks()
@@ -110,6 +120,82 @@ class ProjectServiceTest : BehaviorSpec({
 
                 verify(exactly = 1) { userRepository.findUserByEmail(any()) }
                 verify(exactly = 0) { projectRepository.findMyProjects(any()) }
+            }
+        }
+    }
+
+    Given("관리자(ADMIN)가 프로젝트 생성 요청 시") {
+        val projectName = "냥이프로젝트"
+        val projectDescription = "new 설명"
+        val tagIds = listOf(1L, 2L, 5L)
+
+        val projectCreateRequest = sut.giveMeKotlinBuilder<ProjectCreateRequest>()
+            .set("name", projectName)
+            .set("description", projectDescription)
+            .set("status", ProjectStatus.ACTIVE.name)
+            .set("ownerId", managerUser1.id)
+            .set("tags", tagIds)
+            .sample()
+
+        val tags = mutableSetOf("Backend", "Frontend")
+
+        val savedProject = sut.giveMeKotlinBuilder<Project>()
+            .setNotNull("id")
+            .set("name", projectName)
+            .set("description", projectDescription)
+            .set("projectStatusWrapper", ProjectStatusWrapper(ProjectStatus.ACTIVE))
+            .set("owner", managerUser1)
+            .set("tags", tags)
+            .set("workers", mutableListOf<Worker>())
+            .set("tasks", mutableListOf<Task>())
+            .sample()
+
+        When("Manager를 Owner로 프로젝트를 생성할 경우") {
+            every { userRepository.findByIdOrNull(managerUser1.id) } returns managerUser1
+            every { projectRepository.save(any()) } returns savedProject
+            every { tagRepository.findById(any()) } returns Optional.of(tag)
+
+            Then("프로젝트가 성공적으로 생성된다") {
+                val result = projectService.createProject(projectCreateRequest)
+
+                result.name shouldBe projectName
+                result.description shouldBe projectDescription
+                result.status shouldBe ProjectStatus.ACTIVE.name
+                result.owner shouldBe managerUser1.email
+                result.tags shouldBe mutableSetOf("Backend", "Frontend")
+
+                verify(exactly = 1) { userRepository.findByIdOrNull(managerUser1.id) }
+                verify(exactly = 3) { tagRepository.findById(any()) }
+                verify(exactly = 1) { projectRepository.save(any()) }
+            }
+        }
+
+        When("Worker를 Owner로 프로젝트를 생성할 경우") {
+            every { userRepository.findByIdOrNull(any()) } returns workerUser
+            every { projectRepository.save(any()) } returns savedProject
+
+            Then("IllegalState Exception 예외가 발생한다") {
+                shouldThrow<IllegalStateException> {
+                    projectService.createProject(projectCreateRequest)
+                }
+
+                verify(exactly = 1) { userRepository.findByIdOrNull(any()) }
+                verify(exactly = 0) { tagRepository.findById(any()) }
+                verify(exactly = 0) { projectRepository.save(any()) }
+            }
+        }
+
+        When("존재하지 않는 OwnerID로 요청하는 경우") {
+            every { userRepository.findByIdOrNull(any()) } returns null
+
+            Then("User NotFoundException 예외가 발생한다") {
+                shouldThrow<NotFoundException> {
+                    projectService.createProject(projectCreateRequest)
+                }
+
+                verify(exactly = 1) { userRepository.findByIdOrNull(any()) }
+                verify(exactly = 0) { tagRepository.findById(any()) }
+                verify(exactly = 0) { projectRepository.save(any()) }
             }
         }
     }
