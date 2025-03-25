@@ -152,7 +152,7 @@
   <img src="../img/co-dev_PATCH.png" alt="PATCH image">
 
 #### 삭제(DELETE) - 구현
-- request url: `{{server_url}}/api/v1/projects/6```
+- request url: `{{server_url}}/api/v1/projects/6`
 - response: `204 No Content`
 - imgs
   <img src="../img/co-dev_DELETE.png" alt="DELETE image">
