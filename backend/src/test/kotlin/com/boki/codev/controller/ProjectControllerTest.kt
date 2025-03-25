@@ -41,6 +41,9 @@ class ProjectControllerTest {
             .defaultHeader("Accept", MediaType.APPLICATION_JSON_VALUE)
             .build()
 
+    /**
+     * 조회(GET)
+     */
     @Test
     @DisplayName("인증되지 않은 사용자는 프로젝트 목록 조회에 실패한다")
     fun shouldFailedGetProjectsWithoutAuth() {
@@ -60,10 +63,11 @@ class ProjectControllerTest {
     @Test
     @DisplayName("인증된 사용자는 프로젝트 목록 조회에 성공한다")
     fun shouldSuccessGetProjectsWithAuth() {
-        // when
+        // given
         val accessToken = login(Role.ADMIN)
         val responseType = object : ParameterizedTypeReference<List<ProjectSimpleResponse>>() {}
 
+        // when
         val result = restClient.get()
             .uri("/api/v1/projects")
             .header("Authorization", "Bearer $accessToken")
@@ -82,6 +86,9 @@ class ProjectControllerTest {
         assertThat(projects[0].tags).containsExactlyInAnyOrder("Backend", "Frontend", "Devops")
     }
 
+    /**
+     * 추가(POST)
+     */
     @ParameterizedTest
     @CsvSource(
         "MANAGER, 403",
@@ -121,7 +128,7 @@ class ProjectControllerTest {
     @Test
     @DisplayName("관리자(ADMIN)는 프로젝트 생성에 성공한다")
     fun shouldSuccessCreateProjectWithAdmin() {
-        // when
+        // given
         val accessToken = login(Role.ADMIN)
         val projectCreateRequest = ProjectCreateRequest(
             name = "New Project",
@@ -134,6 +141,7 @@ class ProjectControllerTest {
         )
         val responseType = ProjectSimpleResponse::class.java
 
+        // when
         val result = restClient.post()
             .uri("/api/v1/projects")
             .header("Authorization", "Bearer $accessToken")
