@@ -62,7 +62,7 @@ data class ProjectUpdateRequest(
     val tags: List<Long>? = emptyList(),
 )
 
-data class Owner(
+data class OwnerChangeRequest(
     @field:PositiveOrZero(message = "ownerId는 null 또는 양수여야 합니다.")
     val ownerId: Long?
 )

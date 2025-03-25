@@ -1,6 +1,6 @@
 package com.boki.codev.controller
 
-import com.boki.codev.dto.Owner
+import com.boki.codev.dto.OwnerChangeRequest
 import com.boki.codev.dto.ProjectCreateRequest
 import com.boki.codev.dto.ProjectUpdateRequest
 import com.boki.codev.service.ProjectService
@@ -19,6 +19,14 @@ class ProjectController(
     @GetMapping
     fun getProjects(): ResponseEntity<Any> {
         return ResponseEntity.ok().body(projectService.getProjects())
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN') or @projectPermission.isOwner(authentication, #projectId)")
+    @GetMapping("/{projectId}")
+    fun getProject(
+        @PathVariable projectId: Long
+    ): ResponseEntity<Any> {
+        return ResponseEntity.ok().body(projectService.getProject(projectId))
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")
@@ -44,9 +52,9 @@ class ProjectController(
     @PatchMapping("/{projectId}/owner")
     fun updateProjectOwner(
         @PathVariable projectId: Long,
-        @Valid @RequestBody owner: Owner,
+        @Valid @RequestBody ownerChangeRequest: OwnerChangeRequest
     ): ResponseEntity<Any> {
-        return ResponseEntity.ok().body(projectService.updateProjectOwner(projectId, owner.ownerId))
+        return ResponseEntity.ok().body(projectService.updateProjectOwner(projectId, ownerChangeRequest.ownerId))
     }
 
     @PreAuthorize("hasRole('ROLE_ADMIN')")

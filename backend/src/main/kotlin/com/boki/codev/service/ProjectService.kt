@@ -26,8 +26,8 @@ class ProjectService(
 ) {
     @Transactional(readOnly = true)
     fun getProjects(): List<ProjectSimpleResponse> {
-        val authentication = SecurityContextHolder.getContext().authentication
         logger.debug { "ProjectService.getProjects() call" }
+        val authentication = SecurityContextHolder.getContext().authentication
         return if ("admin@co-dev.com" == authentication.name) {
             projectRepository.findAll().map { ProjectSimpleResponse.from(it) }
         } else {
@@ -35,6 +35,13 @@ class ProjectService(
                 ?: throw NotFoundException("User not found"))
             projectRepository.findMyProjects(user).map(ProjectSimpleResponse::from)
         }
+    }
+
+    @Transactional(readOnly = true)
+    fun getProject(projectId: Long): ProjectSimpleResponse {
+        logger.debug { "ProjectService.getProject() call" }
+        val project = getProjectOrThrow(projectId)
+        return ProjectSimpleResponse.from(project)
     }
 
     @Transactional
