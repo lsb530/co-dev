@@ -45,7 +45,7 @@ class ProjectControllerTest {
      * 조회(GET)
      */
     @Test
-    @DisplayName("인증되지 않은 사용자는 프로젝트 목록 조회에 실패한다")
+    @DisplayName("인증되지 않은 사용자는 프로젝트 목록 조회를 할 수 없다")
     fun shouldFailedGetProjectsWithoutAuth() {
         // when
         val result = restClient.get()
@@ -95,7 +95,7 @@ class ProjectControllerTest {
         "WORKER, 403",
         "ANONYMOUS, 401"
     )
-    @DisplayName("관리자(ADMIN)가 아닌 사용자의 프로젝트 생성 요청은 실패한다")
+    @DisplayName("관리자(ADMIN)가 아닌 사용자는 프로젝트를 생성할 수 없다")
     fun shouldFailedCreateProjectWithoutAdmin(roleStr: String, expectedStatusCode: Int) {
         // given
         val accessToken = if (roleStr == "ANONYMOUS") null else login(Role.valueOf(roleStr))
