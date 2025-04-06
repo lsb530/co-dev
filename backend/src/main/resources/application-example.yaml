@@ -1,41 +1,42 @@
 server:
-  port: 28080
+  port:
 spring:
   application:
-    name: backend
+    name:
   datasource:
-    url: jdbc:mysql://localhost:3306/co-dev
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url:
+    username:
+    password:
   sql:
     init:
-      data-locations: classpath:/sql/user.sql
-      mode: never
+      data-locations:
+      mode:
   jpa:
-    open-in-view: false
+    open-in-view:
     hibernate:
-      ddl-auto: create-drop
-    show-sql: true
-    defer-datasource-initialization: true
+      ddl-auto:
+    show-sql:
+    defer-datasource-initialization:
   data:
     redis:
-      host: localhost
-      port: 6379
-      database: 0 # default
-      timeout: 60000
+      host:
+      port:
+      database:
+      timeout:
       lettuce:
         pool:
-          max-active: 8 # default
-          max-idle: 8 # default
-          min-idle: 2 # custom
-          max-wait: -1
+          max-active:
+          max-idle:
+          min-idle:
+          max-wait:
 
 jwt:
-  secret-key: ${SECRET_KEY}
-  access-token-expiration: 1800 # 30분
-  refresh-token-expiration: 1296000 # 2주
+  secret-key:
+  access-token-expiration:
+  refresh-token-expiration:
+  admin-token-expiration:
 
 logging:
   level:
-    root: info
-    com.zaxxer.hikari.HikariConfig: debug
+    root:
+    com.zaxxer.hikari.HikariConfig:
